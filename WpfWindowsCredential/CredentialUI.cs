@@ -30,7 +30,7 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult Prompt(String caption, String message)
+        public static PromptCredentialsResult? Prompt(String caption, String message)
         {
             return Prompt(caption, message, null, null);
         }
@@ -41,7 +41,7 @@ namespace Misuzilla.Security
         /// <param name="message"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult Prompt(String caption, String message, IntPtr hwndParent)
+        public static PromptCredentialsResult? Prompt(String caption, String message, IntPtr hwndParent)
         {
             return Prompt(caption, message, hwndParent, null, null);
         }
@@ -53,7 +53,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult Prompt(String caption, String message, String userName, String password)
+        public static PromptCredentialsResult? Prompt(String caption, String message, String? userName, String? password)
         {
             return Prompt(caption, message, IntPtr.Zero, userName, password);
         }
@@ -66,7 +66,7 @@ namespace Misuzilla.Security
         /// <param name="password"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult Prompt(String caption, String message, IntPtr hwndParent, String userName, String password)
+        public static PromptCredentialsResult? Prompt(String caption, String message, IntPtr hwndParent, String? userName, String? password)
         {
             if (Environment.OSVersion.Version.Major >= 6)
             {
@@ -85,7 +85,7 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptWithSecureString(String caption, String message)
+        public static PromptCredentialsSecureStringResult? PromptWithSecureString(String caption, String message)
         {
             return PromptWithSecureString(caption, message, IntPtr.Zero);
         }
@@ -96,7 +96,7 @@ namespace Misuzilla.Security
         /// <param name="message"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptWithSecureString(String caption, String message, IntPtr hwndParent)
+        public static PromptCredentialsSecureStringResult? PromptWithSecureString(String caption, String message, IntPtr hwndParent)
         {
             return PromptWithSecureString(caption, message, IntPtr.Zero, null, null);
         }
@@ -108,7 +108,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptWithSecureString(String caption, String message, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptWithSecureString(String caption, String message, SecureString? userName, SecureString? password)
         {
             return PromptWithSecureString(caption, message, IntPtr.Zero, userName, password);
         }
@@ -121,7 +121,7 @@ namespace Misuzilla.Security
         /// <param name="password"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptWithSecureString(String caption, String message, IntPtr hwndParent, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptWithSecureString(String caption, String message, IntPtr hwndParent, SecureString? userName, SecureString? password)
         {
             if (Environment.OSVersion.Version.Major >= 6)
             {
@@ -143,21 +143,11 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForWindowsCredentials(String caption, String message)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message)
         {
             return PromptForWindowsCredentials(caption, message, String.Empty, String.Empty);
         }
-        /// <summary>
-        /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
-        /// </summary>
-        /// <param name="caption"></param>
-        /// <param name="message"></param>
-        /// <param name="hwndParent"></param>
-        /// <returns></returns>
-        public static PromptCredentialsResult PromptForWindowsCredentials(String caption, String message, IntPtr hwndParent)
-        {
-            return PromptForWindowsCredentials(caption, message, hwndParent);
-        }
+
         /// <summary>
         /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
         /// </summary>
@@ -166,7 +156,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForWindowsCredentials(String caption, String message, String userName, String password)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message, String? userName, String? password)
         {
             return PromptForWindowsCredentials(caption, message, IntPtr.Zero, userName, password);
         }
@@ -179,9 +169,9 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForWindowsCredentials(String caption, String message, IntPtr hwndParent, String userName, String password)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message, IntPtr hwndParent, String? userName, String? password)
         {
-            PromptForWindowsCredentialsOptions options = new PromptForWindowsCredentialsOptions(caption, message)
+            var options = new PromptForWindowsCredentialsOptions(caption, message)
             {
                 HwndParent = hwndParent,
                 IsSaveChecked = false
@@ -196,29 +186,27 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForWindowsCredentials(PromptForWindowsCredentialsOptions options, String userName, String password)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(PromptForWindowsCredentialsOptions options, String? userName, String? password)
         {
             if (String.IsNullOrEmpty(userName) && String.IsNullOrEmpty(password))
                 return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(options, null, null);
 
-            using (SecureString userNameS = new SecureString())
-            using (SecureString passwordS = new SecureString())
+            using var userNameS = new SecureString();
+            using var passwordS = new SecureString();
+            if (!String.IsNullOrEmpty(userName))
             {
-                if (!String.IsNullOrEmpty(userName))
-                {
-                    foreach (var c in userName)
-                        userNameS.AppendChar(c);
-                }
-                if (!String.IsNullOrEmpty(password))
-                {
-                    foreach (var c in password)
-                        passwordS.AppendChar(c);
-                }
-
-                userNameS.MakeReadOnly();
-                passwordS.MakeReadOnly();
-                return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(options, userNameS, passwordS);
+                foreach (var c in userName)
+                    userNameS.AppendChar(c);
             }
+            if (!String.IsNullOrEmpty(password))
+            {
+                foreach (var c in password)
+                    passwordS.AppendChar(c);
+            }
+
+            userNameS.MakeReadOnly();
+            passwordS.MakeReadOnly();
+            return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(options, userNameS, passwordS);
         }
         /// <summary>
         /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
@@ -226,7 +214,7 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForWindowsCredentialsWithSecureString(String caption, String message)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsWithSecureString(String caption, String message)
         {
             return PromptForWindowsCredentialsWithSecureString(caption, message, IntPtr.Zero, null, null);
         }
@@ -237,7 +225,7 @@ namespace Misuzilla.Security
         /// <param name="message"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForWindowsCredentialsWithSecureString(String caption, String message, IntPtr hwndParent)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsWithSecureString(String caption, String message, IntPtr hwndParent)
         {
             return PromptForWindowsCredentialsWithSecureString(caption, message, hwndParent, null, null);
         }
@@ -249,7 +237,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForWindowsCredentialsWithSecureString(String caption, String message, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsWithSecureString(String caption, String message, SecureString? userName, SecureString? password)
         {
             return PromptForWindowsCredentialsWithSecureString(caption, message, IntPtr.Zero, userName, password);
         }
@@ -262,9 +250,9 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForWindowsCredentialsWithSecureString(String caption, String message, IntPtr hwndParent, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsWithSecureString(String caption, String message, IntPtr hwndParent, SecureString? userName, SecureString? password)
         {
-            PromptForWindowsCredentialsOptions options = new PromptForWindowsCredentialsOptions(caption, message)
+            var options = new PromptForWindowsCredentialsOptions(caption, message)
             {
                 HwndParent = hwndParent,
                 IsSaveChecked = false
@@ -278,14 +266,14 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForWindowsCredentialsWithSecureString(PromptForWindowsCredentialsOptions options, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsWithSecureString(PromptForWindowsCredentialsOptions options, SecureString? userName, SecureString? password)
         {
             return PromptForWindowsCredentialsInternal<PromptCredentialsSecureStringResult>(options, userName, password);
         }
 
-        private static T PromptForWindowsCredentialsInternal<T>(PromptForWindowsCredentialsOptions options, SecureString userName, SecureString password) where T : class, IPromptCredentialsResult
+        private static T? PromptForWindowsCredentialsInternal<T>(PromptForWindowsCredentialsOptions options, SecureString? userName, SecureString? password) where T : class, IPromptCredentialsResult
         {
-            NativeMethods.CREDUI_INFO creduiInfo = new NativeMethods.CREDUI_INFO()
+            var credulityInfo = new NativeMethods.CREDUI_INFO()
             {
                 pszCaptionText = options.Caption,
                 pszMessageText = options.Message,
@@ -293,44 +281,36 @@ namespace Misuzilla.Security
                 hbmBanner = options.HbmBanner
             };
 
-            PromptForWindowsCredentialsFlag credentialsFlag = options.Flags;
-
-            IntPtr userNamePtr = IntPtr.Zero;
-            IntPtr passwordPtr = IntPtr.Zero;
-            Int32 authPackage = 0;
-            IntPtr outAuthBuffer = IntPtr.Zero;
-            Int32 outAuthBufferSize = 0;
-            IntPtr inAuthBuffer = IntPtr.Zero;
-            Int32 inAuthBufferSize = 0;
-            Boolean save = options.IsSaveChecked;
+            var credentialsFlag = options.Flags;
+            var userNamePtr = IntPtr.Zero;
+            var passwordPtr = IntPtr.Zero;
+            var authPackage = 0;
+            var outAuthBuffer = IntPtr.Zero;
+            var inAuthBuffer = IntPtr.Zero;
+            var inAuthBufferSize = 0;
+            var save = options.IsSaveChecked;
             try
             {
                 if (userName != null || password != null)
                 {
-                    if (userName == null)
-                        userName = new SecureString();
-                    if (password == null)
-                        password = new SecureString();
+                    userName ??= new SecureString();
+                    password ??= new SecureString();
                     userNamePtr = Marshal.SecureStringToCoTaskMemUnicode(userName);
                     passwordPtr = Marshal.SecureStringToCoTaskMemUnicode(password);
                 }
 
-                // prefilled with UserName or Password
+                // pre-filled with UserName or Password
                 if (userNamePtr != IntPtr.Zero || passwordPtr != IntPtr.Zero)
                 {
                     inAuthBufferSize = 1024;
                     inAuthBuffer = Marshal.AllocCoTaskMem(inAuthBufferSize);
-                    if (
-                        !NativeMethods.CredPackAuthenticationBuffer(0x00, userNamePtr, passwordPtr, inAuthBuffer,
-                                                            ref inAuthBufferSize))
+                    if (!NativeMethods.CredPackAuthenticationBuffer(0x00, userNamePtr, passwordPtr, inAuthBuffer, ref inAuthBufferSize))
                     {
                         var win32Error = Marshal.GetLastWin32Error();
                         if (win32Error == 122 /*ERROR_INSUFFICIENT_BUFFER*/)
                         {
                             inAuthBuffer = Marshal.ReAllocCoTaskMem(inAuthBuffer, inAuthBufferSize);
-                            if (
-                                !NativeMethods.CredPackAuthenticationBuffer(0x00, userNamePtr, passwordPtr, inAuthBuffer,
-                                                                    ref inAuthBufferSize))
+                            if (!NativeMethods.CredPackAuthenticationBuffer(0x00, userNamePtr, passwordPtr, inAuthBuffer, ref inAuthBufferSize))
                             {
                                 throw new Win32Exception(Marshal.GetLastWin32Error());
                             }
@@ -342,13 +322,13 @@ namespace Misuzilla.Security
                     }
                 }
 
-                var retVal = NativeMethods.CredUIPromptForWindowsCredentials(creduiInfo,
+                var retVal = NativeMethods.CredUIPromptForWindowsCredentials(credulityInfo,
                                                                      options.AuthErrorCode,
                                                                      ref authPackage,
                                                                      inAuthBuffer,
                                                                      inAuthBufferSize,
                                                                      out outAuthBuffer,
-                                                                     out outAuthBufferSize,
+                                                                     out var outAuthBufferSize,
                                                                      ref save,
                                                                      credentialsFlag
                                                                      );
@@ -399,7 +379,7 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(String targetName, String caption, String message)
+        public static PromptCredentialsResult? PromptForCredentials(String targetName, String caption, String message)
         {
             return PromptForCredentials(new PromptForCredentialsOptions(targetName, caption, message));
         }
@@ -411,7 +391,7 @@ namespace Misuzilla.Security
         /// <param name="message"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(String targetName, String caption, String message, IntPtr hwndParent)
+        public static PromptCredentialsResult? PromptForCredentials(String targetName, String caption, String message, IntPtr hwndParent)
         {
             return PromptForCredentials(targetName, caption, message, hwndParent);
         }
@@ -424,7 +404,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(String targetName, String caption, String message, String userName, String password)
+        public static PromptCredentialsResult? PromptForCredentials(String targetName, String caption, String message, String? userName, String? password)
         {
             return PromptForCredentials(targetName, caption, message, IntPtr.Zero, userName, password);
         }
@@ -438,7 +418,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(String targetName, String caption, String message, IntPtr hwndParent, String userName, String password)
+        public static PromptCredentialsResult? PromptForCredentials(String targetName, String caption, String message, IntPtr hwndParent, String? userName, String? password)
         {
             return PromptForCredentials(new PromptForCredentialsOptions(targetName, caption, message) { HwndParent = hwndParent }, userName, password);
         }
@@ -447,7 +427,7 @@ namespace Misuzilla.Security
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(PromptForCredentialsOptions options)
+        public static PromptCredentialsResult? PromptForCredentials(PromptForCredentialsOptions options)
         {
             return PromptForCredentials(options, null, null);
         }
@@ -458,7 +438,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsResult PromptForCredentials(PromptForCredentialsOptions options, String userName, String password)
+        public static PromptCredentialsResult? PromptForCredentials(PromptForCredentialsOptions options, String? userName, String? password)
         {
             using (SecureString userNameS = new SecureString())
             using (SecureString passwordS = new SecureString())
@@ -486,7 +466,7 @@ namespace Misuzilla.Security
         /// <param name="caption"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(String targetName, String caption, String message)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(String targetName, String caption, String message)
         {
             return PromptForCredentialsWithSecureString(new PromptForCredentialsOptions(targetName, caption, message));
         }
@@ -498,7 +478,7 @@ namespace Misuzilla.Security
         /// <param name="message"></param>
         /// <param name="hwndParent"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(String targetName, String caption, String message, IntPtr hwndParent)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(String targetName, String caption, String message, IntPtr hwndParent)
         {
             return PromptForCredentialsWithSecureString(targetName, caption, message, hwndParent, null, null);
         }
@@ -511,7 +491,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(String targetName, String caption, String message, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(String targetName, String caption, String message, SecureString? userName, SecureString? password)
         {
             return PromptForCredentialsWithSecureString(targetName, caption, message, IntPtr.Zero, userName, password);
         }
@@ -525,7 +505,7 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(String targetName, String caption, String message, IntPtr hwndParent, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(String targetName, String caption, String message, IntPtr hwndParent, SecureString? userName, SecureString? password)
         {
             return PromptForCredentialsWithSecureString(new PromptForCredentialsOptions(targetName, caption, message) { HwndParent = hwndParent }, userName, password);
         }
@@ -534,7 +514,7 @@ namespace Misuzilla.Security
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(PromptForCredentialsOptions options)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(PromptForCredentialsOptions options)
         {
             return PromptForCredentialsInternal<PromptCredentialsSecureStringResult>(options, null, null);
         }
@@ -545,30 +525,30 @@ namespace Misuzilla.Security
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static PromptCredentialsSecureStringResult PromptForCredentialsWithSecureString(PromptForCredentialsOptions options, SecureString userName, SecureString password)
+        public static PromptCredentialsSecureStringResult? PromptForCredentialsWithSecureString(PromptForCredentialsOptions options, SecureString? userName, SecureString? password)
         {
             return PromptForCredentialsInternal<PromptCredentialsSecureStringResult>(options, userName, password);
         }
 
-        private static T PromptForCredentialsInternal<T>(PromptForCredentialsOptions options, SecureString userName, SecureString password) where T : class, IPromptCredentialsResult
+        private static T? PromptForCredentialsInternal<T>(PromptForCredentialsOptions options, SecureString? userName, SecureString? password) where T : class, IPromptCredentialsResult
         {
             if (options == null)
                 throw new ArgumentNullException("options");
-            if (userName != null && (userName.Length > NativeMethods.CREDUI_MAX_USERNAME_LENGTH))
+            if (userName is {Length: > NativeMethods.CREDUI_MAX_USERNAME_LENGTH})
                 throw new ArgumentOutOfRangeException("userName", "CREDUI_MAX_USERNAME_LENGTH");
-            if (password != null && (password.Length > NativeMethods.CREDUI_MAX_PASSWORD_LENGTH))
+            if (password is {Length: > NativeMethods.CREDUI_MAX_PASSWORD_LENGTH})
                 throw new ArgumentOutOfRangeException("password", "CREDUI_MAX_PASSWORD_LENGTH");
 
-            NativeMethods.CREDUI_INFO creduiInfo = new NativeMethods.CREDUI_INFO()
+            var credulityInfo = new NativeMethods.CREDUI_INFO()
             {
                 pszCaptionText = options.Caption,
                 pszMessageText = options.Message,
                 hwndParent = options.HwndParent,
                 hbmBanner = options.HbmBanner
             };
-            IntPtr userNamePtr = IntPtr.Zero;
-            IntPtr passwordPtr = IntPtr.Zero;
-            Boolean save = options.IsSaveChecked;
+            var userNamePtr = IntPtr.Zero;
+            var passwordPtr = IntPtr.Zero;
+            var save = options.IsSaveChecked;
             try
             {
                 // The maximum number of characters that can be copied to (pszUserName|szPassword) including the terminating null character.
@@ -596,7 +576,7 @@ namespace Misuzilla.Security
                 Marshal.WriteInt16(userNamePtr, NativeMethods.CREDUI_MAX_USERNAME_LENGTH * sizeof(Int16), 0x00);
                 Marshal.WriteInt16(passwordPtr, NativeMethods.CREDUI_MAX_PASSWORD_LENGTH * sizeof(Int16), 0x00);
 
-                var retVal = NativeMethods.CredUIPromptForCredentials(creduiInfo,
+                var retVal = NativeMethods.CredUIPromptForCredentials(credulityInfo,
                                                               options.TargetName,
                                                               IntPtr.Zero,
                                                               options.AuthErrorCode,
@@ -650,12 +630,11 @@ namespace Misuzilla.Security
         }
         #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
+
         [Flags]
         public enum PromptForWindowsCredentialsFlag
         {
+            CREDUIWIN_NONE = 0x00000000,
             /// <summary>
             /// Plain text username/password is being requested
             /// </summary>
@@ -690,9 +669,7 @@ namespace Misuzilla.Security
             CREDUIWIN_PACK_32_WOW = 0x10000000
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+
         [Flags]
         public enum PromptForCredentialsFlag
         {
@@ -806,7 +783,7 @@ namespace Misuzilla.Security
                     throw new ArgumentNullException("message");
                 Caption = caption;
                 Message = message;
-                Flags = PromptForWindowsCredentialsFlag.CREDUIWIN_GENERIC;
+                Flags = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE;
             }
         }
         /// <summary>

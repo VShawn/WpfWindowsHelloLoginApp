@@ -40,7 +40,7 @@ namespace WpfWindowsHelloLoginApp
                     case KeyCredentialStatus.Success:
                         var resourceName = "My App";
                         Windows.Security.Credentials.PasswordCredential? pass = null;
-                        var vault = new Windows.Security.Credentials.PasswordVault(); 
+                        var vault = new Windows.Security.Credentials.PasswordVault();
                         try
                         {
                             //var credentialList = vault.FindAllByResource(resourceName);
@@ -95,7 +95,7 @@ namespace WpfWindowsHelloLoginApp
             // Create the CREDUI_INFO struct.
             CREDUI_INFO credui = new CREDUI_INFO();
             credui.cbSize = Marshal.SizeOf(credui);
-            credui.pszCaptionText = "Connect to your application";
+            credui.pszCaptionText = "Connect to your applicationc测试";
             credui.pszMessageText = "Enter your credentials!";
             credui.hwndParent = new WindowInteropHelper(this).Handle;
 
@@ -212,7 +212,116 @@ namespace WpfWindowsHelloLoginApp
             CREDUIWIN_PACK_32_WOW = 0x10000000,
         }
         #endregion
+
+
+
+        private class Native
+        {
+            [DllImport("credui", CharSet = CharSet.Unicode)]
+            public static extern CredUIReturnCodes CredUIPromptForWindowsCredentials(
+                ref CredUIInfo credUIInfo,
+                int errorCode,
+                ref uint authPackage,
+                IntPtr sourceAuthBuffer,
+                uint sourceAuthBufferSize,
+                out IntPtr targetAuthBuffer,
+                out uint targetAuthBufferSize,
+                [MarshalAs(UnmanagedType.Bool)] ref bool save,
+                CredWinUIFlags flags
+            );
+
+            [DllImport("credui", CharSet = CharSet.Unicode, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool CredUnPackAuthenticationBuffer(
+                CredPackFlags flags,
+                IntPtr authBuffer,
+                uint authBufferSize,
+                StringBuilder username,
+                out int usernameLength,
+                StringBuilder domain,
+                out int domainLength,
+                out IntPtr password,
+                out int passwordLength
+            );
+
+            [DllImport("credui", CharSet = CharSet.Unicode, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool CredUnPackAuthenticationBuffer(
+                CredPackFlags flags,
+                IntPtr authBuffer,
+                uint authBufferSize,
+                StringBuilder username,
+                out int usernameLength,
+                StringBuilder domain,
+                out int domainLength,
+                StringBuilder password,
+                out int passwordLength
+            );
+
+            [DllImport("advapi32", CharSet = CharSet.Unicode, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool LogonUser(
+                string username,
+                string domain,
+                IntPtr password,
+                LogonType logonType,
+                LogonProvider logonProvider,
+                out IntPtr handle
+            );
+
+            [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool CloseHandle(IntPtr handle);
+        }
+
+
+        public void Test()
+        {
+            var info = GetCredUIInfo();
+            uint authPackage = 0;
+            bool saveChecked = false;
+            IntPtr buffer;
+            uint bufferLength;
+
+            var ui = Native.CredUIPromptForWindowsCredentials(
+                ref info,
+                0,
+                ref authPackage,
+                IntPtr.Zero,
+                0,
+                out buffer,
+                out bufferLength,
+                CredWinUIFlags.GenericCredentials
+            );
+
+            if (uiResult == CredUIReturnCodes.NoError)
+            {
+                int usernameLength = 513,
+                    domainLength = 337,
+                    passwordLength = 256;
+                StringBuilder username = new StringBuilder(usernameLength);
+                StringBuilder domain = new StringBuilder(domainLength);
+                IntPtr password;
+
+                if (Native.CredUnPackAuthenticationBuffer(
+                        CredPackFlags.PackProtectedCredentials,
+                        buffer, bufferLength,
+                        username, ref usernameLength,
+                        domain, ref domainLength,
+                        password, ref passwordLength
+                    ))
+                {
+                    IntPtr logonToken;
+                    if (Native.LogonUser(
+                            username,
+                            domain,
+                            password,
+                            LogonType.NewCredentials,
+                            LogonProvider.WindowsNT50,
+                            out logonToken
+
+
     }
 
 
-}
+            }

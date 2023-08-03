@@ -13,6 +13,7 @@
             <Button Click="Button_OnClickPromptForWindowsCredentials" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">PromptForWindowsCredentials</Button>
             <Button Click="Button_OnClickPromptForCredentialsWithSecureString" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">PromptForCredentialsWithSecureString</Button>
             <Button Click="Button_OnClickPromptForWindowsCredentialsWithSecureString" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">PromptForWindowsCredentialsWithSecureString</Button>
+            <Button Click="ButtonLoginWithPass_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">ButtonLoginWithPass_OnClick</Button>
         </StackPanel>
     </Grid>
 </Window>
