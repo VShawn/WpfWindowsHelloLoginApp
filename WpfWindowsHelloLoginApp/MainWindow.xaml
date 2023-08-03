@@ -8,6 +8,9 @@
         WindowStartupLocation="CenterScreen"
         Title="MainWindow" Height="250" Width="400">
     <Grid>
+        <StackPanel VerticalAlignment="Center">
             <Button Click="ButtonLogin_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login with PIN</Button>
+            <Button Click="ButtonLoginWithPass_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login with pass</Button>
+        </StackPanel>
     </Grid>
 </Window>

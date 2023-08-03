@@ -8,6 +8,10 @@
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 		<LangVersion>latest</LangVersion>
 		<DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+		<!--<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
+		<_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
+		<_SuppressWpfTrimError>true</_SuppressWpfTrimError>-->
 	</PropertyGroup>
 
 	<ItemGroup>
