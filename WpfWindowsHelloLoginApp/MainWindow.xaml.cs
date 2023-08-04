@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Windows.Security.Credentials;
+using WpfWindowsHelloLoginApp.CredentialUI;
 
 namespace WpfWindowsHelloLoginApp
 {
@@ -55,6 +56,7 @@ namespace WpfWindowsHelloLoginApp
                         catch (Exception)
                         {
                         }
+
                         vault.Add(new Windows.Security.Credentials.PasswordCredential(resourceName, "last time", DateTime.Now.ToString("R")));
                         MessageBox.Show("Logged in." + " last pass = " + pass?.Password ?? "null");
                         break;
@@ -82,246 +84,36 @@ namespace WpfWindowsHelloLoginApp
 
         private async void ButtonLoginWithPass_OnClick(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
-
-            // Declare/initialize variables.
-            bool save = false;
-            int errorcode = 0;
-            uint dialogReturn;
-            uint authPackage = 0;
-            IntPtr outCredBuffer;
-            uint outCredSize;
-
-            // Create the CREDUI_INFO struct.
-            CREDUI_INFO credui = new CREDUI_INFO();
-            credui.cbSize = Marshal.SizeOf(credui);
-            credui.pszCaptionText = "Connect to your applicationc测试";
-            credui.pszMessageText = "Enter your credentials!";
-            credui.hwndParent = new WindowInteropHelper(this).Handle;
-
-            // Show the dialog.
-            dialogReturn = CredUIPromptForWindowsCredentials(
-                ref credui,
-                errorcode,
-                ref authPackage,
-                (IntPtr)0,  // You can force that a specific username is shown in the dialog. Create it with 'CredPackAuthenticationBuffer()'. Then, the buffer goes here...
-                0,          // ...and the size goes here. You also have to add CREDUIWIN_IN_CRED_ONLY to the flags (last argument).
-                out outCredBuffer,
-                out outCredSize,
-                ref save,
-                0); // Use the PromptForWindowsCredentialsFlags Enum here. You can use multiple flags if you seperate them with | .
-
-            if (dialogReturn == 1223) // Result of 1223 means the user canceled. Not sure if other errors are ever returned.
-                MessageBox.Show("User cancelled!");
-            if (dialogReturn != 0) // Result of something other than 0 means...something, I'm sure. Either way, failed or canceled.
-                return;
-
-            var domain = new StringBuilder(100);
-            var username = new StringBuilder(100);
-            var password = new StringBuilder(100);
-            int maxLength = 100; // Note that you can have different max lengths for each variable if you want.
-
-            // Unpack the info from the buffer.
-            CredUnPackAuthenticationBuffer(0, outCredBuffer, outCredSize, username, ref maxLength, domain, ref maxLength, password, ref maxLength);
-
-            // Clear the memory allocated by CredUIPromptForWindowsCredentials.
-            CoTaskMemFree(outCredBuffer);
-
-            // Output info, escaping whitespace characters for the password.
-            string ret = "";
-            ret += String.Format("Domain: {0}\n", domain);
-            ret += String.Format("Username: {0}\n", username);
-            ret += String.Format("Password (hashed): {0}\n", EscapeString(password.ToString()));
-            MessageBox.Show(ret);
-        }
-
-        public static string EscapeString(string s)
-        {
-            // Formatted like this only for you, SO.
-            return s
-                .Replace("\a", "\\a")
-                .Replace("\b", "\\b")
-                .Replace("\f", "\\f")
-                .Replace("\n", "\\n")
-                .Replace("\r", "\\r")
-                .Replace("\t", "\\t")
-                .Replace("\v", "\\v");
-        }
-
-        #region DLLImports
-        [DllImport("ole32.dll")]
-        public static extern void CoTaskMemFree(IntPtr ptr);
-
-        [DllImport("credui.dll", CharSet = CharSet.Unicode)]
-        private static extern uint CredUIPromptForWindowsCredentials(ref CREDUI_INFO notUsedHere, int authError, ref uint authPackage, IntPtr InAuthBuffer,
-          uint InAuthBufferSize, out IntPtr refOutAuthBuffer, out uint refOutAuthBufferSize, ref bool fSave, PromptForWindowsCredentialsFlags flags);
-
-        [DllImport("credui.dll", CharSet = CharSet.Unicode)]
-        private static extern bool CredUnPackAuthenticationBuffer(int dwFlags, IntPtr pAuthBuffer, uint cbAuthBuffer, StringBuilder pszUserName, ref int pcchMaxUserName, StringBuilder pszDomainName, ref int pcchMaxDomainame, StringBuilder pszPassword, ref int pcchMaxPassword);
-        #endregion
-
-        #region Structs and Enums
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct CREDUI_INFO
-        {
-            public int cbSize;
-            public IntPtr hwndParent;
-            public string pszMessageText;
-            public string pszCaptionText;
-            public IntPtr hbmBanner;
-        }
-
-        private enum PromptForWindowsCredentialsFlags
-        {
-            /// <summary>
-            /// The caller is requesting that the credential provider return the user name and password in plain text.
-            /// This value cannot be combined with SECURE_PROMPT.
-            /// </summary>
-            CREDUIWIN_GENERIC = 0x1,
-            /// <summary>
-            /// The Save check box is displayed in the dialog box.
-            /// </summary>
-            CREDUIWIN_CHECKBOX = 0x2,
-            /// <summary>
-            /// Only credential providers that support the authentication package specified by the authPackage parameter should be enumerated.
-            /// This value cannot be combined with CREDUIWIN_IN_CRED_ONLY.
-            /// </summary>
-            CREDUIWIN_AUTHPACKAGE_ONLY = 0x10,
-            /// <summary>
-            /// Only the credentials specified by the InAuthBuffer parameter for the authentication package specified by the authPackage parameter should be enumerated.
-            /// If this flag is set, and the InAuthBuffer parameter is NULL, the function fails.
-            /// This value cannot be combined with CREDUIWIN_AUTHPACKAGE_ONLY.
-            /// </summary>
-            CREDUIWIN_IN_CRED_ONLY = 0x20,
-            /// <summary>
-            /// Credential providers should enumerate only administrators. This value is intended for User Account Control (UAC) purposes only. We recommend that external callers not set this flag.
-            /// </summary>
-            CREDUIWIN_ENUMERATE_ADMINS = 0x100,
-            /// <summary>
-            /// Only the incoming credentials for the authentication package specified by the authPackage parameter should be enumerated.
-            /// </summary>
-            CREDUIWIN_ENUMERATE_CURRENT_USER = 0x200,
-            /// <summary>
-            /// The credential dialog box should be displayed on the secure desktop. This value cannot be combined with CREDUIWIN_GENERIC.
-            /// Windows Vista: This value is not supported until Windows Vista with SP1.
-            /// </summary>
-            CREDUIWIN_SECURE_PROMPT = 0x1000,
-            /// <summary>
-            /// The credential provider should align the credential BLOB pointed to by the refOutAuthBuffer parameter to a 32-bit boundary, even if the provider is running on a 64-bit system.
-            /// </summary>
-            CREDUIWIN_PACK_32_WOW = 0x10000000,
-        }
-        #endregion
-
-
-
-        private class Native
-        {
-            [DllImport("credui", CharSet = CharSet.Unicode)]
-            public static extern CredUIReturnCodes CredUIPromptForWindowsCredentials(
-                ref CredUIInfo credUIInfo,
-                int errorCode,
-                ref uint authPackage,
-                IntPtr sourceAuthBuffer,
-                uint sourceAuthBufferSize,
-                out IntPtr targetAuthBuffer,
-                out uint targetAuthBufferSize,
-                [MarshalAs(UnmanagedType.Bool)] ref bool save,
-                CredWinUIFlags flags
-            );
-
-            [DllImport("credui", CharSet = CharSet.Unicode, SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CredUnPackAuthenticationBuffer(
-                CredPackFlags flags,
-                IntPtr authBuffer,
-                uint authBufferSize,
-                StringBuilder username,
-                out int usernameLength,
-                StringBuilder domain,
-                out int domainLength,
-                out IntPtr password,
-                out int passwordLength
-            );
-
-            [DllImport("credui", CharSet = CharSet.Unicode, SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CredUnPackAuthenticationBuffer(
-                CredPackFlags flags,
-                IntPtr authBuffer,
-                uint authBufferSize,
-                StringBuilder username,
-                out int usernameLength,
-                StringBuilder domain,
-                out int domainLength,
-                StringBuilder password,
-                out int passwordLength
-            );
-
-            [DllImport("advapi32", CharSet = CharSet.Unicode, SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool LogonUser(
-                string username,
-                string domain,
-                IntPtr password,
-                LogonType logonType,
-                LogonProvider logonProvider,
-                out IntPtr handle
-            );
-
-            [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CloseHandle(IntPtr handle);
-        }
-
-
-        public void Test()
-        {
-            var info = GetCredUIInfo();
-            uint authPackage = 0;
-            bool saveChecked = false;
-            IntPtr buffer;
-            uint bufferLength;
-
-            var ui = Native.CredUIPromptForWindowsCredentials(
-                ref info,
-                0,
-                ref authPackage,
-                IntPtr.Zero,
-                0,
-                out buffer,
-                out bufferLength,
-                CredWinUIFlags.GenericCredentials
-            );
-
-            if (uiResult == CredUIReturnCodes.NoError)
+            if (WindowsCredentialHelper.LogonUserWithWindowsCredential("验证你的账户", "请输入当前Windows的凭据", new WindowInteropHelper(this).Handle) == WindowsCredentialHelper.LogonUserStatus.Success)
             {
-                int usernameLength = 513,
-                    domainLength = 337,
-                    passwordLength = 256;
-                StringBuilder username = new StringBuilder(usernameLength);
-                StringBuilder domain = new StringBuilder(domainLength);
-                IntPtr password;
-
-                if (Native.CredUnPackAuthenticationBuffer(
-                        CredPackFlags.PackProtectedCredentials,
-                        buffer, bufferLength,
-                        username, ref usernameLength,
-                        domain, ref domainLength,
-                        password, ref passwordLength
-                    ))
-                {
-                    IntPtr logonToken;
-                    if (Native.LogonUser(
-                            username,
-                            domain,
-                            password,
-                            LogonType.NewCredentials,
-                            LogonProvider.WindowsNT50,
-                            out logonToken
-
-
-    }
-
-
+                MessageBox.Show("验证成功");
             }
+            else
+            {
+                MessageBox.Show("失败");
+            }
+
+            //var result = WindowsCredentialHelper.PromptForWindowsCredentials("Hi", "body", new WindowInteropHelper(this).Handle);
+            //if (result?.HasNoError == true)
+            //{
+            //    MessageBox.Show($"输入的信息：\r\n  {result.UserName} \r\n {result.Password} \r\n {result.DomainName} \r\n {result.IsSaveChecked}");
+            //}
+            //else
+            //{
+            //    MessageBox.Show("密码未输入完成");
+            //}
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (WindowsCredentialHelper.LogonUser(User.Text, Pass.Text) == WindowsCredentialHelper.LogonUserStatus.Success)
+            {
+                MessageBox.Show("验证成功");
+            }
+            else
+            {
+                MessageBox.Show("失败");
+            }
+        }
+    }
+}

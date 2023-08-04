@@ -177,7 +177,6 @@ namespace Misuzilla.Security
                 IsSaveChecked = false
             };
             return PromptForWindowsCredentials(options, userName, password);
-
         }
         /// <summary>
         /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
@@ -752,7 +751,7 @@ namespace Misuzilla.Security
             private String _message;
             public String Caption
             {
-                get { return _caption; }
+                get => _caption;
                 set
                 {
                     if (value.Length > NativeMethods.CREDUI_MAX_CAPTION_LENGTH)
@@ -762,7 +761,7 @@ namespace Misuzilla.Security
             }
             public String Message
             {
-                get { return _message; }
+                get => _message;
                 set
                 {
                     if (value.Length > NativeMethods.CREDUI_MAX_MESSAGE_LENGTH)
@@ -945,18 +944,18 @@ namespace Misuzilla.Security
 
             public static PromptCredentialsResult CredUnPackAuthenticationBufferWrap(Boolean decryptProtectedCredentials, IntPtr authBufferPtr, Int32 authBufferSize)
             {
-                StringBuilder sbUserName = new StringBuilder(255);
-                StringBuilder sbDomainName = new StringBuilder(255);
-                StringBuilder sbPassword = new StringBuilder(255);
-                Int32 userNameSize = sbUserName.Capacity;
-                Int32 domainNameSize = sbDomainName.Capacity;
-                Int32 passwordSize = sbPassword.Capacity;
+                var sbUserName = new StringBuilder(255);
+                var sbDomainName = new StringBuilder(255);
+                var sbPassword = new StringBuilder(255);
+                var userNameSize = sbUserName.Capacity;
+                var domainNameSize = sbDomainName.Capacity;
+                var passwordSize = sbPassword.Capacity;
 
                 //#define CRED_PACK_PROTECTED_CREDENTIALS      0x1
                 //#define CRED_PACK_WOW_BUFFER                 0x2
                 //#define CRED_PACK_GENERIC_CREDENTIALS        0x4
 
-                Boolean result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                var result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
                                                                 authBufferPtr,
                                                                 authBufferSize,
                                                                 sbUserName,
@@ -1005,12 +1004,12 @@ namespace Misuzilla.Security
 
             public static PromptCredentialsSecureStringResult CredUnPackAuthenticationBufferWrapSecureString(Boolean decryptProtectedCredentials, IntPtr authBufferPtr, Int32 authBufferSize)
             {
-                Int32 userNameSize = 255;
-                Int32 domainNameSize = 255;
-                Int32 passwordSize = 255;
-                IntPtr userNamePtr = IntPtr.Zero;
-                IntPtr domainNamePtr = IntPtr.Zero;
-                IntPtr passwordPtr = IntPtr.Zero;
+                var userNameSize = 255;
+                var domainNameSize = 255;
+                var passwordSize = 255;
+                var userNamePtr = IntPtr.Zero;
+                var domainNamePtr = IntPtr.Zero;
+                var passwordPtr = IntPtr.Zero;
                 try
                 {
                     userNamePtr = Marshal.AllocCoTaskMem(userNameSize);
@@ -1021,7 +1020,7 @@ namespace Misuzilla.Security
                     //#define CRED_PACK_WOW_BUFFER                 0x2
                     //#define CRED_PACK_GENERIC_CREDENTIALS        0x4
 
-                    Boolean result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                    var result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
                                                                     authBufferPtr,
                                                                     authBufferSize,
                                                                     userNamePtr,

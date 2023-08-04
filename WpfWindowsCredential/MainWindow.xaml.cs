@@ -182,58 +182,64 @@ namespace WpfWindowsCredential
         private void Button_OnClickPromptForCredentials(object sender, RoutedEventArgs e)
         {
             var ret = CredentialUI.PromptForCredentials("target name", "test", "tes message");
-            MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
+            if (ret != null)
+                MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
         }
 
         private void Button_OnClickPromptForWindowsCredentials(object sender, RoutedEventArgs e)
         {
             var ret = CredentialUI.PromptForWindowsCredentials("caption", "tes message");
-
-            string userName = ret.UserName;
-            string userPassword = ret.Password;
-            string domain = ret.DomainName;
-            // Call LogonUser to obtain a handle to an access token. 
-            bool returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
-                NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
-                out var tokenHandle);
-            if (returnValue)
+            if (ret != null)
             {
-                tokenHandle.Dispose();
+                string userName = ret.UserName;
+                string userPassword = ret.Password;
+                string domain = ret.DomainName;
+                // Call LogonUser to obtain a handle to an access token. 
+                bool returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
+                    NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
+                    out var tokenHandle);
+                if (returnValue)
+                {
+                    tokenHandle.Dispose();
 
-                //using (tokenHandle)
-                //{
-                //    //// Use the token handle returned by LogonUser. 
-                //    //using (WindowsImpersonationContext impersonatedUser = WindowsIdentity.Impersonate(safeTokenHandle.DangerousGetHandle()))
-                //    //{
-                //    //    var sourceGenerator = new Generator.SolutionAnalayzer(solutionPath);
-                //    //    var workspaceModel = sourceGenerator.BuildWorkspaceModel(repoRootPath);
-                //    //    return workspaceModel;
-                //    //}
-                //    //// Releasing the context object stops the impersonation 
-                //}
-                MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
-            }
-            else
-            {
-                int err = Marshal.GetLastWin32Error();
-                MessageBox.Show(err.ToString("X"));
+                    //using (tokenHandle)
+                    //{
+                    //    //// Use the token handle returned by LogonUser. 
+                    //    //using (WindowsImpersonationContext impersonatedUser = WindowsIdentity.Impersonate(safeTokenHandle.DangerousGetHandle()))
+                    //    //{
+                    //    //    var sourceGenerator = new Generator.SolutionAnalayzer(solutionPath);
+                    //    //    var workspaceModel = sourceGenerator.BuildWorkspaceModel(repoRootPath);
+                    //    //    return workspaceModel;
+                    //    //}
+                    //    //// Releasing the context object stops the impersonation 
+                    //}
+                    MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
+                }
+                else
+                {
+                    int err = Marshal.GetLastWin32Error();
+                    MessageBox.Show(err.ToString("X"));
+                }
             }
         }
 
         private void Button_OnClickPrompt(object sender, RoutedEventArgs e)
         {
             var ret = CredentialUI.Prompt("caption", "tes message");
-            MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
+            if (ret != null)
+                MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
         }
         private void Button_OnClickPromptForCredentialsWithSecureString(object sender, RoutedEventArgs e)
         {
             var ret = CredentialUI.PromptForCredentialsWithSecureString("target name", "caption", "tes message");
-            MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
+            if (ret != null)
+                MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
         }
         private void Button_OnClickPromptForWindowsCredentialsWithSecureString(object sender, RoutedEventArgs e)
         {
             var ret = CredentialUI.PromptForWindowsCredentialsWithSecureString("caption", "tes message");
-            MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
+            if (ret != null)
+                MessageBox.Show($"{ret.UserName} \r\n {ret.Password} \r\n {ret.DomainName} \r\n {ret.IsSaveChecked}");
         }
 
 
