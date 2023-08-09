@@ -11,8 +11,8 @@
         <StackPanel VerticalAlignment="Center">
             <Button Click="ButtonLogin_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login with PIN</Button>
             <Button Click="ButtonLoginWithPass_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login with pass</Button>
-            <TextBox Name="User">Admin</TextBox>
-            <TextBox Name="Pass">Pass</TextBox>
+            <TextBox Name="User">Shawn</TextBox>
+            <TextBox Name="Pass">123456</TextBox>
             <Button Click="ButtonBase_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login</Button>
         </StackPanel>
     </Grid>

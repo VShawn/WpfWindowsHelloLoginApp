@@ -84,7 +84,11 @@ namespace WpfWindowsHelloLoginApp
 
         private async void ButtonLoginWithPass_OnClick(object sender, RoutedEventArgs e)
         {
-            if (WindowsCredentialHelper.LogonUserWithWindowsCredential("验证你的账户", "请输入当前Windows的凭据", new WindowInteropHelper(this).Handle) == WindowsCredentialHelper.LogonUserStatus.Success)
+            if (WindowsCredentialHelper.LogonUserWithWindowsCredential("验证你的账户", "请输入当前Windows的凭据", 
+                    new WindowInteropHelper(this).Handle,
+                    User.Text, Pass.Text,
+                    WindowsCredentialHelper.PromptForWindowsCredentialsFlag.CREDUIWIN_ENUMERATE_CURRENT_USER
+                    ) == WindowsCredentialHelper.LogonUserStatus.Success)
             {
                 MessageBox.Show("验证成功");
             }

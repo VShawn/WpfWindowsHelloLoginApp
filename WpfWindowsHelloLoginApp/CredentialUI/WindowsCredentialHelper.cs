@@ -191,6 +191,18 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                 ref Int32 pcchMaxPassword
             );
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            public static extern Boolean CredUnPackAuthenticationBufferA(
+                Int32 dwFlags,
+                IntPtr pAuthBuffer,
+                Int32 cbAuthBuffer,
+                StringBuilder pszUserName,
+                ref Int32 pcchMaxUserName,
+                StringBuilder pszDomainName,
+                ref Int32 pcchMaxDomainame,
+                StringBuilder pszPassword,
+                ref Int32 pcchMaxPassword
+            );
+            [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern Boolean CredUnPackAuthenticationBuffer(
                 Int32 dwFlags,
                 IntPtr pAuthBuffer,
@@ -659,9 +671,9 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         /// </code>
         /// </example>
         /// <returns>return null for cancel or other error</returns>
-        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
-            return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(caption, message, hwndParent, userName: userName, password: password);
+            return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(caption, message, hwndParent, userName: userName, password: password, credentialsFlag: credentialsFlag);
         }
 
 
@@ -669,9 +681,9 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
         /// </summary>
         /// <returns>return null for cancel or other error</returns>
-        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsSecureString(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsSecureString(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
-            return PromptForWindowsCredentialsInternal<PromptCredentialsSecureStringResult>(caption, message, hwndParent, userName: userName, password: password);
+            return PromptForWindowsCredentialsInternal<PromptCredentialsSecureStringResult>(caption, message, hwndParent, userName: userName, password: password, credentialsFlag: credentialsFlag);
         }
 
         public enum LogonUserStatus
@@ -686,6 +698,14 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             bool returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
                 NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
                 out var tokenHandle);
+            if (!returnValue && userName.IndexOf("\\") > 0)
+            {
+                userName = userName.Substring(userName.IndexOf("\\") + 1);
+                returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
+                    NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
+                    out tokenHandle);
+            }
+
             if (returnValue)
             {
                 tokenHandle.Dispose();
@@ -711,9 +731,9 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             return LogonUserStatus.Failed;
         }
 
-        public static LogonUserStatus LogonUserWithWindowsCredential(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null)
+        public static LogonUserStatus LogonUserWithWindowsCredential(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
-            var ret = PromptForWindowsCredentials(caption, message, hwndParent, userName, password);
+            var ret = PromptForWindowsCredentials(caption, message, hwndParent, userName, password, credentialsFlag);
             if (ret?.HasNoError == true)
             {
                 return LogonUser(ret.UserName, ret.Password, ret.DomainName);
