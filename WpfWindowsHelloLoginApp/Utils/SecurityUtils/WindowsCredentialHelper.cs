@@ -1,24 +1,19 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
-namespace WpfWindowsHelloLoginApp.CredentialUI
+namespace _1RM.Utils.SecurityUtils
 {
-    internal static class WindowsCredentialHelper
+    public static class WindowsCredentialHelper
     {
         #region IPromptCredentialsResult
         public interface IPromptCredentialsResult
         {
-            public Boolean IsSaveChecked { get; set; }
+            public bool IsSaveChecked { get; set; }
             public int? ErrorCode { get; set; }
             public string? ErrorMessage { get; set; }
         }
@@ -38,10 +33,10 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                 ErrorMessage = errorMessage;
             }
 
-            public String UserName { get; internal set; }
-            public String DomainName { get; internal set; }
-            public String Password { get; internal set; }
-            public Boolean IsSaveChecked { get; set; }
+            public string UserName { get; internal set; }
+            public string DomainName { get; internal set; }
+            public string Password { get; internal set; }
+            public bool IsSaveChecked { get; set; }
             public int? ErrorCode { get; set; }
             public string? ErrorMessage { get; set; }
 
@@ -65,14 +60,14 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             public SecureString UserName { get; internal set; }
             public SecureString DomainName { get; internal set; }
             public SecureString Password { get; internal set; }
-            public Boolean IsSaveChecked { get; set; }
+            public bool IsSaveChecked { get; set; }
             public int? ErrorCode { get; set; }
             public string? ErrorMessage { get; set; }
         }
         #endregion
 
         [Flags]
-        public enum PromptForWindowsCredentialsFlag
+        public enum PromptForWindowsCredentialsFlag : uint
         {
             CREDUIWIN_NONE = 0x00000000,
             /// <summary>
@@ -106,18 +101,19 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             /// <summary>
             /// Tell the credential provider it should be packing its Auth Blob 32 bit even though it is running 64 native
             /// </summary>
-            CREDUIWIN_PACK_32_WOW = 0x10000000
+            CREDUIWIN_PACK_32_WOW = 0x10000000,
+            CREDUI_FLAGS_KEEP_USERNAME = 0x100000
         }
 
 
         private static class NativeMethods
         {
             #region CredUIPromptForWindowsCredentials
-            public const Int32 CREDUI_MAX_MESSAGE_LENGTH = 32767;
-            public const Int32 CREDUI_MAX_CAPTION_LENGTH = 128;
-            public const Int32 CRED_MAX_USERNAME_LENGTH = (256 + 1 + 256);
-            public const Int32 CREDUI_MAX_USERNAME_LENGTH = CRED_MAX_USERNAME_LENGTH;
-            public const Int32 CREDUI_MAX_PASSWORD_LENGTH = (512 / 2);
+            public const int CREDUI_MAX_MESSAGE_LENGTH = 32767;
+            public const int CREDUI_MAX_CAPTION_LENGTH = 128;
+            public const int CRED_MAX_USERNAME_LENGTH = 256 + 1 + 256;
+            public const int CREDUI_MAX_USERNAME_LENGTH = CRED_MAX_USERNAME_LENGTH;
+            public const int CREDUI_MAX_PASSWORD_LENGTH = 512 / 2;
 
             public enum CredUIPromptReturnCode
             {
@@ -130,12 +126,12 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             [StructLayout(LayoutKind.Sequential)]
             public class CREDUI_INFO
             {
-                public Int32 cbSize;
+                public int cbSize;
                 public IntPtr hwndParent;
                 [MarshalAs(UnmanagedType.LPWStr)]
-                public String pszMessageText;
+                public string pszMessageText;
                 [MarshalAs(UnmanagedType.LPWStr)]
-                public String pszCaptionText;
+                public string pszCaptionText;
                 public IntPtr hbmBanner;
 
                 public CREDUI_INFO()
@@ -151,73 +147,73 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             public static extern CredUIPromptReturnCode
             CredUIPromptForWindowsCredentials(
                 CREDUI_INFO pUiInfo,
-                Int32 dwAuthError,
-                ref Int32 pulAuthPackage,
+                int dwAuthError,
+                ref int pulAuthPackage,
                 IntPtr pvInAuthBuffer,
-                Int32 ulInAuthBufferSize,
+                int ulInAuthBufferSize,
                 out IntPtr ppvOutAuthBuffer,
-                out Int32 pulOutAuthBufferSize,
-                ref Boolean pfSave,
-                PromptForWindowsCredentialsFlag dwFlags
+                out int pulOutAuthBufferSize,
+                ref bool pfSave,
+                uint dwFlags
             );
 
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern Boolean CredPackAuthenticationBuffer(
-                Int32 dwFlags,
-                String pszUserName,
-                String pszPassword,
+            public static extern bool CredPackAuthenticationBuffer(
+                int dwFlags,
+                string pszUserName,
+                string pszPassword,
                 IntPtr pPackedCredentials,
-                ref Int32 pcbPackedCredentials
+                ref int pcbPackedCredentials
             );
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern Boolean CredPackAuthenticationBuffer(
-                Int32 dwFlags,
+            public static extern bool CredPackAuthenticationBuffer(
+                int dwFlags,
                 IntPtr pszUserName,
                 IntPtr pszPassword,
                 IntPtr pPackedCredentials,
-                ref Int32 pcbPackedCredentials
+                ref int pcbPackedCredentials
             );
 
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern Boolean CredUnPackAuthenticationBuffer(
-                Int32 dwFlags,
+            public static extern bool CredUnPackAuthenticationBuffer(
+                int dwFlags,
                 IntPtr pAuthBuffer,
-                Int32 cbAuthBuffer,
+                int cbAuthBuffer,
                 StringBuilder pszUserName,
-                ref Int32 pcchMaxUserName,
+                ref int pcchMaxUserName,
                 StringBuilder pszDomainName,
-                ref Int32 pcchMaxDomainame,
+                ref int pcchMaxDomainame,
                 StringBuilder pszPassword,
-                ref Int32 pcchMaxPassword
+                ref int pcchMaxPassword
             );
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern Boolean CredUnPackAuthenticationBufferA(
-                Int32 dwFlags,
+            public static extern bool CredUnPackAuthenticationBufferA(
+                int dwFlags,
                 IntPtr pAuthBuffer,
-                Int32 cbAuthBuffer,
+                int cbAuthBuffer,
                 StringBuilder pszUserName,
-                ref Int32 pcchMaxUserName,
+                ref int pcchMaxUserName,
                 StringBuilder pszDomainName,
-                ref Int32 pcchMaxDomainame,
+                ref int pcchMaxDomainame,
                 StringBuilder pszPassword,
-                ref Int32 pcchMaxPassword
+                ref int pcchMaxPassword
             );
             [DllImport("credui.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern Boolean CredUnPackAuthenticationBuffer(
-                Int32 dwFlags,
+            public static extern bool CredUnPackAuthenticationBuffer(
+                int dwFlags,
                 IntPtr pAuthBuffer,
-                Int32 cbAuthBuffer,
+                int cbAuthBuffer,
                 IntPtr pszUserName,
-                ref Int32 pcchMaxUserName,
+                ref int pcchMaxUserName,
                 IntPtr pszDomainName,
-                ref Int32 pcchMaxDomainame,
+                ref int pcchMaxDomainame,
                 IntPtr pszPassword,
-                ref Int32 pcchMaxPassword
+                ref int pcchMaxPassword
             );
 
 
 
-            public static PromptCredentialsResult CredUnPackAuthenticationBufferWrap(Boolean decryptProtectedCredentials, IntPtr authBufferPtr, Int32 authBufferSize)
+            public static PromptCredentialsResult CredUnPackAuthenticationBufferWrap(bool decryptProtectedCredentials, IntPtr authBufferPtr, int authBufferSize)
             {
                 var sbUserName = new StringBuilder(4096);
                 var sbDomainName = new StringBuilder(4096);
@@ -230,7 +226,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                 //#define CRED_PACK_WOW_BUFFER                 0x2
                 //#define CRED_PACK_GENERIC_CREDENTIALS        0x4
 
-                var result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                var result = CredUnPackAuthenticationBuffer(decryptProtectedCredentials ? 0x1 : 0x0,
                                                                 authBufferPtr,
                                                                 authBufferSize,
                                                                 sbUserName,
@@ -248,7 +244,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                         sbUserName.Capacity = userNameSize;
                         sbPassword.Capacity = passwordSize;
                         sbDomainName.Capacity = domainNameSize;
-                        result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                        result = CredUnPackAuthenticationBuffer(decryptProtectedCredentials ? 0x1 : 0x0,
                                                                 authBufferPtr,
                                                                 authBufferSize,
                                                                 sbUserName,
@@ -260,19 +256,19 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                                                                 );
                         if (!result)
                         {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                            return PromptCredentialsResult.Error(Marshal.GetLastWin32Error(), "");
                         }
                     }
                     else
                     {
-                        throw new Win32Exception(win32Error);
+                        return PromptCredentialsResult.Error(win32Error, "");
                     }
                 }
 
                 return new PromptCredentialsResult(sbUserName.ToString(), sbDomainName.ToString(), sbPassword.ToString(), false);
             }
 
-            public static PromptCredentialsSecureStringResult CredUnPackAuthenticationBufferWrapSecureString(Boolean decryptProtectedCredentials, IntPtr authBufferPtr, Int32 authBufferSize)
+            public static PromptCredentialsSecureStringResult CredUnPackAuthenticationBufferWrapSecureString(bool decryptProtectedCredentials, IntPtr authBufferPtr, int authBufferSize)
             {
                 var userNameSize = 255;
                 var domainNameSize = 255;
@@ -290,7 +286,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                     //#define CRED_PACK_WOW_BUFFER                 0x2
                     //#define CRED_PACK_GENERIC_CREDENTIALS        0x4
 
-                    var result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                    var result = CredUnPackAuthenticationBuffer(decryptProtectedCredentials ? 0x1 : 0x0,
                                                                     authBufferPtr,
                                                                     authBufferSize,
                                                                     userNamePtr,
@@ -308,7 +304,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                             userNamePtr = Marshal.ReAllocCoTaskMem(userNamePtr, userNameSize);
                             domainNamePtr = Marshal.ReAllocCoTaskMem(domainNamePtr, domainNameSize);
                             passwordPtr = Marshal.ReAllocCoTaskMem(passwordPtr, passwordSize);
-                            result = CredUnPackAuthenticationBuffer((decryptProtectedCredentials ? 0x1 : 0x0),
+                            result = CredUnPackAuthenticationBuffer(decryptProtectedCredentials ? 0x1 : 0x0,
                                                                     authBufferPtr,
                                                                     authBufferSize,
                                                                     userNamePtr,
@@ -477,25 +473,24 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             }
 
             [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern bool LogonUser(String lpszUsername, String lpszDomain, String lpszPassword, LogonTypes dwLogonType, LogonProvider dwLogonProvider, out SafeTokenHandle phToken);
+            public static extern bool LogonUser(string lpszUsername, string lpszDomain, string lpszPassword, LogonTypes dwLogonType, LogonProvider dwLogonProvider, out SafeTokenHandle phToken);
 
             [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern bool LogonUser(String lpszUsername, String lpszDomain, IntPtr phPassword, LogonTypes dwLogonType, LogonProvider dwLogonProvider, out SafeTokenHandle phToken);
+            public static extern bool LogonUser(string lpszUsername, string lpszDomain, IntPtr phPassword, LogonTypes dwLogonType, LogonProvider dwLogonProvider, out SafeTokenHandle phToken);
 
             [DllImport("advapi32.dll", SetLastError = true)]
             public static extern bool DuplicateToken(SafeTokenHandle ExistingTokenHandle, SecurityImpersonationLevel SECURITY_IMPERSONATION_LEVEL, out SafeTokenHandle DuplicateTokenHandle);
 
             #endregion
 
-
             #region Utility Methods
             public static SecureString PtrToSecureString(IntPtr p)
             {
                 SecureString s = new SecureString();
-                Int32 i = 0;
+                int i = 0;
                 while (true)
                 {
-                    Char c = (Char)Marshal.ReadInt16(p, ((i++) * sizeof(Int16)));
+                    char c = (char)Marshal.ReadInt16(p, i++ * sizeof(short));
                     if (c == '\u0000')
                         break;
                     s.AppendChar(c);
@@ -503,11 +498,11 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                 s.MakeReadOnly();
                 return s;
             }
-            public static SecureString PtrToSecureString(IntPtr p, Int32 length)
+            public static SecureString PtrToSecureString(IntPtr p, int length)
             {
                 SecureString s = new SecureString();
                 for (var i = 0; i < length; i++)
-                    s.AppendChar((Char)Marshal.ReadInt16(p, i * sizeof(Int16)));
+                    s.AppendChar((char)Marshal.ReadInt16(p, i * sizeof(short)));
                 s.MakeReadOnly();
                 return s;
             }
@@ -530,8 +525,8 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         }
 
         private static T? PromptForWindowsCredentialsInternal<T>(
-            String caption, String message, IntPtr? hwndParent = null,
-            PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE,
+            string caption, string message, IntPtr? hwndParent = null,
+            uint credentialsFlag = (uint)PromptForWindowsCredentialsFlag.CREDUIWIN_NONE,
             bool isSaveChecked = false,
             string? userName = null, string? password = null) where T : class, IPromptCredentialsResult
         {
@@ -559,7 +554,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             {
                 if (userName != null || password != null)
                 {
-                    if (!String.IsNullOrEmpty(userName))
+                    if (!string.IsNullOrEmpty(userName))
                     {
                         if (userName.Length > NativeMethods.CREDUI_MAX_USERNAME_LENGTH)
                         {
@@ -568,7 +563,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                         foreach (var c in userName)
                             userNameS.AppendChar(c);
                     }
-                    if (!String.IsNullOrEmpty(password))
+                    if (!string.IsNullOrEmpty(password))
                     {
                         if (password.Length > NativeMethods.CREDUI_MAX_USERNAME_LENGTH)
                         {
@@ -612,6 +607,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                                                                      out outAuthBuffer,
                                                                      out var outAuthBufferSize,
                                                                      ref save,
+                                                                     //(int)(PromptForWindowsCredentialsFlag.CREDUIWIN_AUTHPACKAGE_ONLY)
                                                                      credentialsFlag // Use the PromptForWindowsCredentialsFlags Enum here. You can use multiple flags if you seperate them with | .
                                                                      );
 
@@ -622,7 +618,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
                     case NativeMethods.CredUIPromptReturnCode.Success:
                         break;
                     default:
-                        return GetPromptForWindowsCredentialsError<T>((Int32)retVal, $"CredUIPromptReturnCode error code: {(Int32)retVal}");
+                        return GetPromptForWindowsCredentialsError<T>((int)retVal, $"CredUIPromptReturnCode error code: {(int)retVal}");
                         //throw new Win32Exception((Int32)retVal);
                 }
 
@@ -671,7 +667,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         /// </code>
         /// </example>
         /// <returns>return null for cancel or other error</returns>
-        public static PromptCredentialsResult? PromptForWindowsCredentials(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
+        public static PromptCredentialsResult? PromptForWindowsCredentials(string caption, string message, IntPtr? hwndParent = null, string? userName = null, string? password = null, uint credentialsFlag = (uint)PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
             return PromptForWindowsCredentialsInternal<PromptCredentialsResult>(caption, message, hwndParent, userName: userName, password: password, credentialsFlag: credentialsFlag);
         }
@@ -681,7 +677,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         /// Creates and displays a configurable dialog box that allows users to supply credential information by using any credential provider installed on the local computer.
         /// </summary>
         /// <returns>return null for cancel or other error</returns>
-        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsSecureString(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
+        public static PromptCredentialsSecureStringResult? PromptForWindowsCredentialsSecureString(string caption, string message, IntPtr? hwndParent = null, string? userName = null, string? password = null, uint credentialsFlag = (uint)PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
             return PromptForWindowsCredentialsInternal<PromptCredentialsSecureStringResult>(caption, message, hwndParent, userName: userName, password: password, credentialsFlag: credentialsFlag);
         }
@@ -695,12 +691,19 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
         public static LogonUserStatus LogonUser(string userName, string userPassword, string domain = "")
         {
             // Call LogonUser to obtain a handle to an access token. 
-            bool returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
-                NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
-                out var tokenHandle);
-            if (!returnValue && userName.IndexOf("\\") > 0)
+            bool returnValue = false;
+            NativeMethods.SafeTokenHandle? tokenHandle = null;
+            if (userName.IndexOf("\\") > 0)
             {
                 userName = userName.Substring(userName.IndexOf("\\") + 1);
+                //var userName2 = userName.Substring(userName.IndexOf("\\") + 1);
+                //returnValue = NativeMethods.LogonUser(userName2, domain, userPassword,
+                //    NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
+                //    out tokenHandle);
+            }
+
+            if (!returnValue)
+            {
                 returnValue = NativeMethods.LogonUser(userName, domain, userPassword,
                     NativeMethods.LogonTypes.LOGON32_LOGON_INTERACTIVE, NativeMethods.LogonProvider.LOGON32_PROVIDER_DEFAULT,
                     out tokenHandle);
@@ -708,19 +711,7 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
 
             if (returnValue)
             {
-                tokenHandle.Dispose();
-
-                //using (tokenHandle)
-                //{
-                //    //// Use the token handle returned by LogonUser. 
-                //    //using (WindowsImpersonationContext impersonatedUser = WindowsIdentity.Impersonate(safeTokenHandle.DangerousGetHandle()))
-                //    //{
-                //    //    var sourceGenerator = new Generator.SolutionAnalayzer(solutionPath);
-                //    //    var workspaceModel = sourceGenerator.BuildWorkspaceModel(repoRootPath);
-                //    //    return workspaceModel;
-                //    //}
-                //    //// Releasing the context object stops the impersonation 
-                //}
+                tokenHandle?.Dispose();
                 return LogonUserStatus.Success;
             }
             //else
@@ -731,8 +722,9 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             return LogonUserStatus.Failed;
         }
 
-        public static LogonUserStatus LogonUserWithWindowsCredential(String caption, String message, IntPtr? hwndParent = null, String? userName = null, String? password = null, PromptForWindowsCredentialsFlag credentialsFlag = PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
+        public static LogonUserStatus LogonUserWithWindowsCredential(string caption, string message, IntPtr? hwndParent = null, string? userName = null, string? password = null, uint credentialsFlag = (int)PromptForWindowsCredentialsFlag.CREDUIWIN_NONE)
         {
+            userName ??= GetUserName();
             var ret = PromptForWindowsCredentials(caption, message, hwndParent, userName, password, credentialsFlag);
             if (ret?.HasNoError == true)
             {
@@ -742,8 +734,20 @@ namespace WpfWindowsHelloLoginApp.CredentialUI
             {
                 return LogonUserStatus.Cancel;
             }
-
+            else
+            {
+                //MessageBox.Show("Error code = " + ret.ErrorCode);
+            }
             return LogonUserStatus.Failed;
         }
+
+
+        public static string GetUserName()
+        {
+            //return System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            return Environment.UserName;
+            //return Environment.UserDomainName + "\\" + Environment.UserName;
+        }
     }
+
 }
