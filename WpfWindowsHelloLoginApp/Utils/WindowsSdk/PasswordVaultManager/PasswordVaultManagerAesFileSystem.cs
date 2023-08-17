@@ -2,22 +2,29 @@
 using System.IO;
 using System.Security.Cryptography;
 
-namespace _1RM.Utils.SecurityUtils.PasswordVaultManager
+namespace _1RM.Utils.WindowsSdk.PasswordVaultManager
 {
     internal class PasswordVaultManagerAesFileSystem : IPasswordManager
     {
         private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".1Remote");
 
-        public string Retrieve(string key)
+        public string? Retrieve(string key)
         {
-            var keyFile = Path.Combine(LocalFolder, "key");
-            var keyBytes = ReadOrGenerateRandomKeyFile(keyFile);
+            try
+            {
+                var keyFile = Path.Combine(LocalFolder, "key");
+                var keyBytes = ReadOrGenerateRandomKeyFile(keyFile);
 
-            var passwordFile = Path.Combine(LocalFolder, key, "token");
-            var encrypted = File.ReadAllBytes(passwordFile);
+                var passwordFile = Path.Combine(LocalFolder, key, "token");
+                var encrypted = File.ReadAllBytes(passwordFile);
 
-            var password = DecryptStringFromBytes(encrypted, keyBytes);
-            return password;
+                var password = DecryptStringFromBytes(encrypted, keyBytes);
+                return password;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public void Add(string key, string password)
@@ -91,16 +98,16 @@ namespace _1RM.Utils.SecurityUtils.PasswordVaultManager
 
         }
 
-        static string DecryptStringFromBytes(byte[] cipherTextCombined, byte[] key)
+        static string? DecryptStringFromBytes(byte[] cipherTextCombined, byte[] key)
         {
             // Declare the string used to hold 
             // the decrypted text. 
-            string plaintext = null;
-
-            // Create an Aes object 
-            // with the specified key and IV. 
-            using (var aesAlg = Aes.Create())
+            string? plaintext = null;
+            try
             {
+                // Create an Aes object 
+                // with the specified key and IV. 
+                using var aesAlg = Aes.Create();
                 aesAlg.Key = key;
 
                 var iv = new byte[aesAlg.BlockSize / 8];
@@ -117,22 +124,17 @@ namespace _1RM.Utils.SecurityUtils.PasswordVaultManager
                 var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
                 // Create the streams used for decryption. 
-                using (var msDecrypt = new MemoryStream(cipherText))
-                {
-                    using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (var srDecrypt = new StreamReader(csDecrypt))
-                        {
-
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string.
-                            plaintext = srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-
+                using var msDecrypt = new MemoryStream(cipherText);
+                using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+                using var srDecrypt = new StreamReader(csDecrypt);
+                // Read the decrypted bytes from the decrypting stream
+                // and place them in a string.
+                plaintext = srDecrypt.ReadToEnd();
             }
-
+            catch
+            {
+                // ignored
+            }
             return plaintext;
         }
     }

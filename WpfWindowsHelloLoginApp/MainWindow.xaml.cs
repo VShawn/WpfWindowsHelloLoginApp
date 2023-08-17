@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Interop;
-using _1RM.Utils.SecurityUtils;
+using _1RM.Utils.WindowsApi.Credential;
+using _1RM.Utils.WindowsSdk;
+using _1RM.Utils.WindowsSdk.PasswordVaultManager;
 using Windows.Security.Credentials;
 
 namespace WpfWindowsHelloLoginApp
@@ -14,7 +16,7 @@ namespace WpfWindowsHelloLoginApp
         public MainWindow()
         {
             InitializeComponent();
-            User.Text = WindowsCredentialHelper.GetUserName();
+            User.Text = CredentialPrompt.GetUserName();
         }
 
         private async void ButtonLogin_OnClick(object sender, RoutedEventArgs e)
@@ -71,13 +73,13 @@ namespace WpfWindowsHelloLoginApp
 
         private async void ButtonLoginWithPass_OnClick(object sender, RoutedEventArgs e)
         {
-            if (WindowsCredentialHelper.LogonUserWithWindowsCredential("验证你的账户", "请输入当前Windows的凭据", 
+            if (CredentialPrompt.LogonUserWithWindowsCredential("验证你的账户", "请输入当前Windows的凭据", 
                     new WindowInteropHelper(this).Handle,
                     null, null,
                     0
-                    | (uint)WindowsCredentialHelper.PromptForWindowsCredentialsFlag.CREDUIWIN_GENERIC
-                    | (uint)WindowsCredentialHelper.PromptForWindowsCredentialsFlag.CREDUIWIN_ENUMERATE_CURRENT_USER
-                    ) == WindowsCredentialHelper.LogonUserStatus.Success)
+                    | (uint)CredentialPrompt.PromptForWindowsCredentialsFlag.CREDUIWIN_GENERIC
+                    | (uint)CredentialPrompt.PromptForWindowsCredentialsFlag.CREDUIWIN_ENUMERATE_CURRENT_USER
+                    ) == CredentialPrompt.LogonUserStatus.Success)
             {
                 MessageBox.Show("验证成功");
             }
@@ -99,7 +101,7 @@ namespace WpfWindowsHelloLoginApp
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            if (WindowsCredentialHelper.LogonUser(User.Text, Pass.Text) == WindowsCredentialHelper.LogonUserStatus.Success)
+            if (CredentialPrompt.LogonUser(User.Text, Pass.Text) == CredentialPrompt.LogonUserStatus.Success)
             {
                 MessageBox.Show("验证成功");
             }
@@ -109,46 +111,61 @@ namespace WpfWindowsHelloLoginApp
             }
         }
 
-        private void ButtonReadVaule(object sender, RoutedEventArgs e)
+        private void ButtonReadValue(object sender, RoutedEventArgs e)
         {
-            var vault = new Windows.Security.Credentials.PasswordVault();
-            Windows.Security.Credentials.PasswordCredential? pass = null;
-            try
-            {
-                pass = vault.Retrieve("My App", "test");
-            }
-            catch (Exception)
-            {
-            }
-            TbPasswordVault.Text = (pass?.Password ?? "null");
+            var p = new PasswordVaultManagerWindowsApi("My App");
+            TbPasswordVault.Text = (p.Retrieve("test") ?? "null");
         }
 
         private void ButtonWriteVault(object sender, RoutedEventArgs e)
         {
             var @new = TbPasswordVault.Text;
-            var vault = new Windows.Security.Credentials.PasswordVault();
-            Windows.Security.Credentials.PasswordCredential? pass = null;
-            try
-            {
-                pass = vault.Retrieve("My App", "test");
-            }
-            catch (Exception)
-            {
-            }
-            vault.Add(new Windows.Security.Credentials.PasswordCredential("My App", "test", @new));
-            MessageBox.Show("Logged in." + " last = " + (pass?.Password ?? "null") + ", this = " + @new);
+            var p = new PasswordVaultManagerWindowsApi("My App");
+            var last = p.Retrieve("test") ?? "null";
+            p.Add("test", @new);
+            MessageBox.Show("Logged in." + " last = " + last + ", this = " + @new);
         }
 
 
         private async void ButtonProtect_OnClick(object sender, RoutedEventArgs e)
         {
-            var p = await DataProtectionForLocal.ProtectAsync(Pass.Text);
+            var p = await DataProtectionForLocal.Protect(Pass.Text);
             Pass.Text = p;
         }
         private async void ButtonUnProtect_OnClick(object sender, RoutedEventArgs e)
         {
-            var s = await DataProtectionForLocal.SampleUnprotectData(Pass.Text);
+            var s = await DataProtectionForLocal.Unprotect(Pass.Text);
             Pass.Text = s;
+        }
+
+        private void ButtonReadValueFromCredentialManagement(object sender, RoutedEventArgs e)
+        {
+            var c = new Credential()
+            {
+                Type = Credential.CredentialTypeEnum.Generic,
+                PersistType = Credential.PersistTypeEnum.LocalComputer,
+                Target = "1Remote_" + "flag",
+            };
+            if (c.Load())
+                TbCMValue.Text = c.Password;
+            else
+                TbCMValue.Text = "null";
+        }
+
+        private void ButtonWriteVaultFromCredentialManagement(object sender, RoutedEventArgs e)
+        {
+            var c = new Credential()
+            {
+                Target = "1Remote_" + "flag",
+                Type = Credential.CredentialTypeEnum.Generic,
+                Username = TbCMValue.Text,
+                Password = TbCMValue.Text,
+                PersistType = Credential.PersistTypeEnum.LocalComputer
+            };
+            if (!c.Save())
+            {
+                MessageBox.Show("Failed");
+            }
         }
     }
 }

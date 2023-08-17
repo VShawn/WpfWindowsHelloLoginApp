@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace _1RM.Utils.SecurityUtils
+namespace _1RM.Utils
 {
     /// <summary>
     ///  https://stackoverflow.com/questions/2819934/detect-windows-version-in-net

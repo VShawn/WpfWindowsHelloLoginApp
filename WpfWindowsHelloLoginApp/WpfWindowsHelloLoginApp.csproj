@@ -9,6 +9,7 @@
 		<LangVersion>latest</LangVersion>
 		<DisableWinExeOutputInference>true</DisableWinExeOutputInference>
 		<RootNamespace>_1RM</RootNamespace>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<!--<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
 		<_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
@@ -17,6 +18,10 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Utils\SecurityUtils\" />
 	</ItemGroup>
 
 </Project>

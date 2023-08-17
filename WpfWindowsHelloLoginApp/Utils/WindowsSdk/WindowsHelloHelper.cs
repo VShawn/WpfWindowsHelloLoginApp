@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using Windows.Security.Credentials;
 
-namespace _1RM.Utils.SecurityUtils
+namespace _1RM.Utils.WindowsSdk
 {
     public class WindowsHelloHelper
     {
-        private static readonly string _accountId = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-
-
         public static bool IsOsSupported => WindowsVersionHelper.IsLowerThanWindows10() == false;
 
         public static async Task<bool> HelloIsAvailable()
@@ -22,18 +18,6 @@ namespace _1RM.Utils.SecurityUtils
             var isAvailable = await KeyCredentialManager.IsSupportedAsync();
             return isAvailable;
         }
-
-        //public static async Task<bool?> HelloVerifyAsyncIfIsSupport(bool defaultReturn = true)
-        //{
-        //    if (WindowsHelloHelper.IsOsSupported)
-        //    {
-        //        if (await WindowsHelloHelper.HelloIsAvailable() == true)
-        //        {
-        //            return await HelloVerifyAsync();
-        //        }
-        //    }
-        //    return defaultReturn;
-        //}
 
         public static async Task<bool?> HelloVerifyAsync()
         {
@@ -63,7 +47,7 @@ namespace _1RM.Utils.SecurityUtils
                 //return false;
 
 
-                var result = await KeyCredentialManager.RequestCreateAsync(_accountId + "-UserConsentVerifier", KeyCredentialCreationOption.ReplaceExisting);
+                var result = await KeyCredentialManager.RequestCreateAsync("UserConsentVerifier", KeyCredentialCreationOption.ReplaceExisting);
                 switch (result.Status)
                 {
                     case KeyCredentialStatus.Success:

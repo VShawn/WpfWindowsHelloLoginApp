@@ -3,15 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfWindowsHelloLoginApp"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="250" Width="400">
-    <Grid>
-        <StackPanel VerticalAlignment="Center">
+        Title="MainWindow" Height="550" Width="400">
+    <ScrollViewer>
+        <StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBox Name="TbPasswordVault" Width="100"></TextBox>
-                <Button Click="ButtonReadVaule" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">read PasswordVault</Button>
+                <Button Click="ButtonReadValue" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">read PasswordVault</Button>
                 <Button Click="ButtonWriteVault" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">write PasswordVault</Button>
             </StackPanel>
             <Button Click="ButtonLogin_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">login with PIN</Button>
@@ -23,6 +22,19 @@
                 <Button Click="ButtonProtect_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10" Margin="2">protect psw</Button>
                 <Button Click="ButtonUnProtect_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10" Margin="2">unprotect psw</Button>
             </StackPanel>
+
+            <GroupBox>
+                <GroupBox.Header>
+                    <TextBlock>CredentialManagement</TextBlock>
+                </GroupBox.Header>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Name="TbCMValue" Width="100"></TextBox>
+                        <Button Click="ButtonReadValueFromCredentialManagement" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">read PasswordVault</Button>
+                        <Button Click="ButtonWriteVaultFromCredentialManagement" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10">write PasswordVault</Button>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Window>
